@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notenrechner – TFO Bozen</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #1A2E4A;
+    --blue-mid: #243d63;
+    --blue-light: #2e4f80;
+    --orange: #E97B2E;
+    --orange-dark: #c4621a;
+    --white: #ffffff;
+    --bg: #f0f4f8;
+    --card: #ffffff;
+    --text: #1A2E4A;
+    --muted: #7a8fa8;
+    --border: #d0dce8;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--blue);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .logo-circle {
+    width: 44px;
+    height: 44px;
+    background: var(--orange);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    color: white;
+    letter-spacing: 1px;
+  }
+
+  header p {
+    font-size: 12px;
+    color: #7a9bc4;
+    margin-top: 1px;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  .semester-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .semester-header {
+    background: var(--blue);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .semester-header h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: white;
+    letter-spacing: 1px;
+  }
+
+  .sem-avg {
+    background: var(--orange);
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  .grades-list {
+    padding: 16px;
+  }
+
+  .col-labels {
+    display: grid;
+    grid-template-columns: 1fr 90px 36px;
+    gap: 8px;
+    padding: 0 4px 8px;
+  }
+
+  .col-labels span {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .col-labels span:nth-child(2) { text-align: center; }
+
+  .grade-row {
+    display: grid;
+    grid-template-columns: 1fr 90px 36px;
+    gap: 8px;
+    margin-bottom: 10px;
+    animation: slideIn 0.2s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .grade-row input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .grade-row input:focus {
+    border-color: var(--orange);
+    background: white;
+  }
+
+  .grade-row input::placeholder { color: var(--muted); }
+  .grade-row input[type=number]::-webkit-inner-spin-button { opacity: 0; }
+
+  .del-btn {
+    width: 36px;
+    height: 42px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .del-btn:hover { background: #fee; border-color: #f99; color: #c44; }
+
+  .add-btn {
+    width: 100%;
+    padding: 10px;
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius-sm);
+    background: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    transition: all 0.15s;
+    margin-top: 4px;
+  }
+
+  .add-btn:hover { border-color: var(--orange); color: var(--orange); background: #fff7f2; }
+
+  .calc-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--orange);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    margin-top: 14px;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .calc-btn:hover { background: var(--orange-dark); }
+  .calc-btn:active { transform: scale(0.98); }
+
+  .result-box {
+    background: var(--blue);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    text-align: center;
+    margin-bottom: 20px;
+    display: none;
+  }
+
+  .result-box.show { display: block; animation: slideIn 0.3s ease; }
+
+  .result-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #7a9bc4;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .result-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    color: var(--orange);
+    line-height: 1;
+  }
+
+  .result-sub {
+    font-size: 13px;
+    color: #7a9bc4;
+    margin-top: 8px;
+  }
+
+  .sem-results {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .sem-result-card {
+    background: var(--blue-mid);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    text-align: center;
+  }
+
+  .sem-result-card .lbl { font-size: 11px; color: #7a9bc4; text-transform: uppercase; letter-spacing: 0.5px; }
+  .sem-result-card .val { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: white; margin-top: 4px; }
+
+  .footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 32px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-circle">TFO</div>
+  <div>
+    <h1>Notenrechner</h1>
+    <p>TFO Max Valier Bozen</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="semester-card">
+    <div class="semester-header">
+      <h2>Semester 1</h2>
+      <div class="sem-avg" id="avg1-badge">Ø –</div>
+    </div>
+    <div class="grades-list">
+      <div class="col-labels">
+        <span>Note</span>
+        <span>Gewichtung</span>
+        <span></span>
+      </div>
+      <div id="rows1"></div>
+      <button class="add-btn" onclick="addRow(1)">+ Note hinzufügen</button>
+      <button class="calc-btn" onclick="calculate()">Berechnen</button>
+    </div>
+  </div>
+
+  <div class="semester-card">
+    <div class="semester-header">
+      <h2>Semester 2</h2>
+      <div class="sem-avg" id="avg2-badge">Ø –</div>
+    </div>
+    <div class="grades-list">
+      <div class="col-labels">
+        <span>Note</span>
+        <span>Gewichtung</span>
+        <span></span>
+      </div>
+      <div id="rows2"></div>
+      <button class="add-btn" onclick="addRow(2)">+ Note hinzufügen</button>
+      <button class="calc-btn" onclick="calculate()">Berechnen</button>
+    </div>
+  </div>
+
+  <div class="result-box" id="result-box">
+    <div class="result-label">Jahresschnitt</div>
+    <div class="result-number" id="jahres-num">–</div>
+    <div class="result-sub" id="result-sub"></div>
+    <div class="sem-results">
+      <div class="sem-result-card">
+        <div class="lbl">Semester 1</div>
+        <div class="val" id="sem1-val">–</div>
+      </div>
+      <div class="sem-result-card">
+        <div class="lbl">Semester 2</div>
+        <div class="val" id="sem2-val">–</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Notenrechner · TFO Max Valier Bozen</div>
+</div>
+
+<script>
+  const counters = { 1: 0, 2: 0 };
+
+  function addRow(sem) {
+    counters[sem]++;
+    const id = counters[sem];
+    const container = document.getElementById('rows' + sem);
+    const row = document.createElement('div');
+    row.className = 'grade-row';
+    row.id = 'row-' + sem + '-' + id;
+    row.innerHTML = `
+      <input type="number" placeholder="Note (z.B. 7)" min="1" max="10" step="0.5" id="note-${sem}-${id}" oninput="liveCalc()">
+      <input type="number" placeholder="100%" min="0" max="200" step="10" value="100" id="gew-${sem}-${id}" oninput="liveCalc()">
+      <button class="del-btn" onclick="delRow(${sem}, ${id})" aria-label="Entfernen">×</button>
+    `;
+    container.appendChild(row);
+    document.getElementById('note-' + sem + '-' + id).focus();
+  }
+
+  function delRow(sem, id) {
+    const row = document.getElementById('row-' + sem + '-' + id);
+    if (row) { row.style.opacity = '0'; row.style.transform = 'translateX(20px)'; row.style.transition = '0.15s'; setTimeout(() => row.remove(), 150); }
+    setTimeout(liveCalc, 160);
+  }
+
+  function getAvg(sem) {
+    let weightedSum = 0, totalGew = 0;
+    const container = document.getElementById('rows' + sem);
+    const rows = container.querySelectorAll('.grade-row');
+    rows.forEach(row => {
+      const noteEl = row.querySelector('input:first-child');
+      const gewEl = row.querySelector('input:nth-child(2)');
+      const note = parseFloat(noteEl.value);
+      const gew = parseFloat(gewEl.value);
+      if (!isNaN(note) && !isNaN(gew) && gew > 0) {
+        weightedSum += note * gew;
+        totalGew += gew;
+      }
+    });
+    return totalGew > 0 ? weightedSum / totalGew : null;
+  }
+
+  function liveCalc() {
+    const a1 = getAvg(1);
+    const a2 = getAvg(2);
+    document.getElementById('avg1-badge').textContent = a1 !== null ? 'Ø ' + a1.toFixed(2) : 'Ø –';
+    document.getElementById('avg2-badge').textContent = a2 !== null ? 'Ø ' + a2.toFixed(2) : 'Ø –';
+  }
+
+  function calculate() {
+    const a1 = getAvg(1);
+    const a2 = getAvg(2);
+    const box = document.getElementById('result-box');
+
+    if (a1 === null && a2 === null) { alert('Bitte mindestens eine Note eingeben!'); return; }
+
+    box.classList.add('show');
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    document.getElementById('sem1-val').textContent = a1 !== null ? a1.toFixed(2) : '–';
+    document.getElementById('sem2-val').textContent = a2 !== null ? a2.toFixed(2) : '–';
+
+    let jahres, sub;
+    if (a1 !== null && a2 !== null) {
+      jahres = (a1 + a2) / 2;
+      sub = 'Durchschnitt aus beiden Semestern';
+    } else if (a1 !== null) {
+      jahres = a1;
+      sub = 'Nur Semester 1 eingetragen';
+    } else {
+      jahres = a2;
+      sub = 'Nur Semester 2 eingetragen';
+    }
+
+    document.getElementById('jahres-num').textContent = jahres.toFixed(2);
+    document.getElementById('result-sub').textContent = sub;
+    liveCalc();
+  }
+
+  addRow(1); addRow(1); addRow(1);
+  addRow(2); addRow(2); addRow(2);
+</script>
+</body>
+</html>
